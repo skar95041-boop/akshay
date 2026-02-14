@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Bank of Maharashtra · Admin Dashboard</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f0f4f8;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        /* Header */
+        .header {
+            background: #003366;
+            color: white;
+            padding: 20px 30px;
+            border-radius: 30px 30px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border-bottom: 4px solid #f9b81b;
+        }
+        .header h1 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .whatsapp-btn:hover {
+            background: #128C7E;
+        }
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        /* Tabs */
+        .tab-bar {
+            display: flex;
+            background: #eef3f9;
+            border-bottom: 2px solid #f9b81b;
+            padding: 0 20px;
+            gap: 8px;
+        }
+        .tab {
+            padding: 14px 24px;
+            font-weight: 600;
+            color: #003366;
+            cursor: pointer;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            background: #d9e3ef;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab.active {
+            background: white;
+            color: #003366;
+            border-bottom: 3px solid #f9b81b;
+        }
+        .tab i {
+            font-size: 1.1rem;
+        }
+        .tab:hover:not(.active) {
+            background: #cbd8e8;
+        }
+        /* Content */
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 30px rgba(0,40,80,0.1);
+        }
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        /* Submissions grid */
+        .submissions {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .submission-card {
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid #d4e2f0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f9b81b;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .card-header h3 {
+            color: #003366;
+            font-weight: 600;
+        }
+        .timestamp {
+            color: #5f6f82;
+            font-size: 0.9rem;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .detail-item {
+            background: white;
+            border-radius: 16px;
+            padding: 12px 16px;
+            border: 1px solid #e2ecf9;
+        }
+        .detail-item strong {
+            color: #003366;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .file-preview img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+        .file-link {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #e9f0f9;
+            border-radius: 30px;
+            color: #003366;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        /* User management */
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .user-table th, .user-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #d4e2f0;
+        }
+        .user-table th {
+            background: #003366;
+            color: white;
+            font-weight: 600;
+        }
+        .user-table tr:hover {
+            background: #f0f7ff;
+        }
+        .btn-action {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 5px;
+        }
+        .btn-edit {
+            background: #f9b81b;
+            color: #003366;
+        }
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-add {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            max-width: 400px;
+            width: 90%;
+            border-radius: 28px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .modal-content h3 {
+            color: #003366;
+            margin-bottom: 20px;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #dde3eb;
+            border-radius: 50px;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .modal-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .modal-buttons .save {
+            background: #003366;
+            color: white;
+        }
+        .modal-buttons .cancel {
+            background: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <div class="header">
+        <h1><i class="fas fa-shield-alt"></i> Bank of Maharashtra · Admin Dashboard</h1>
+        <div class="user-info">
+            <span><i class="fas fa-user"></i> <span id="currentUser"></span></span>
+            <a href="https://wa.me/919876543210" target="_blank" class="whatsapp-btn">
+                <i class="fab fa-whatsapp"></i> Bank WhatsApp
+            </a>
+            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-bar">
+        <div class="tab active" data-tab="submissions"><i class="fas fa-list"></i> Submissions</div>
+        <div class="tab" data-tab="users"><i class="fas fa-users-cog"></i> User Management</div>
+    </div>
+
+    <div class="content">
+        <!-- Submissions Tab -->
+        <div class="tab-pane active" id="submissionsPane">
+            <h2 style="margin-bottom: 20px; color: #003366;"><i class="fas fa-file-alt"></i> All Submissions</h2>
+            <div id="submissionsList" class="submissions"></div>
+        </div>
+
+        <!-- User Management Tab -->
+        <div class="tab-pane" id="usersPane">
+            <h2 style="margin-bottom: 20px; color: #003366;"><i class="fas fa-users"></i> Manage Admin Users</h2>
+            <button class="btn-add" id="addUserBtn"><i class="fas fa-plus"></i> Add New User</button>
+            <table class="user-table" id="userTable">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Add/Edit User -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <h3 id="modalTitle">Add User</h3>
+        <input type="text" id="modalUsername" placeholder="Username">
+        <input type="password" id="modalPassword" placeholder="Password">
+        <div class="modal-buttons">
+            <button class="save" id="modalSave">Save</button>
+            <button class="cancel" id="modalCancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Change Password (for current user) -->
+<div id="passwordModal" class="modal">
+    <div class="modal-content">
+        <h3>Change Your Password</h3>
+        <input type="password" id="oldPassword" placeholder="Old Password">
+        <input type="password" id="newPassword" placeholder="New Password">
+        <input type="password" id="confirmPassword" placeholder="Confirm New Password">
+        <div class="modal-buttons">
+            <button class="save" id="passwordSave">Update</button>
+            <button class="cancel" id="passwordCancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ========== CHECK LOGIN ==========
+    if (sessionStorage.getItem('bom_admin_logged_in') !== 'true') {
+        window.location.href = 'admin_login.html';
+    }
+    const currentUsername = sessionStorage.getItem('bom_admin_user');
+    document.getElementById('currentUser').innerText = currentUsername;
+
+    // ========== DATA STORAGE KEYS ==========
+    const SUBMISSIONS_KEY = 'bom_submissions';
+    const USERS_KEY = 'bom_admin_users';
+
+    // ========== LOAD USERS ==========
+    function getUsers() {
+        return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+    }
+
+    function saveUsers(users) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    // ========== LOAD SUBMISSIONS ==========
+    function loadSubmissions() {
+        const submissions = JSON.parse(localStorage.getItem(SUBMISSIONS_KEY) || '[]');
+        const container = document.getElementById('submissionsList');
+        if (submissions.length === 0) {
+            container.innerHTML = '<div class="no-data" style="text-align:center; padding:50px; color:#a4bbd5;"><i class="fas fa-folder-open fa-3x"></i><p>No submissions yet.</p></div>';
+            return;
+        }
+
+        // Reverse to show latest first
+        submissions.reverse().forEach((sub, index) => {
+            const card = document.createElement('div');
+            card.className = 'submission-card';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            header.innerHTML = `
+                <h3><i class="fas fa-file-alt"></i> Submission #${submissions.length - index} (PAN: ${sub.pan || 'N/A'})</h3>
+                <span class="timestamp"><i class="far fa-clock"></i> ${new Date(sub.timestamp).toLocaleString()}</span>
+            `;
+            card.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'details-grid';
+
+            function addDetail(label, value) {
+                if (!value && value !== 0) return;
+                const item = document.createElement('div');
+                item.className = 'detail-item';
+                item.innerHTML = `<strong>${label}</strong><div>${value}</div>`;
+                grid.appendChild(item);
+            }
+
+            // Basic info
+            addDetail('Agent Name', sub.agentName);
+            addDetail('Mobile', sub.agentMobile);
+            addDetail('WhatsApp', sub.whatsapp);
+            addDetail('Email', sub.email);
+            addDetail('Father\'s Name', sub.fatherName);
+            addDetail('Mother\'s Name', sub.motherName);
+            addDetail('DOB', sub.dob);
+            addDetail('Aadhaar', sub.aadhaar);
+            addDetail('PAN', sub.pan);
+            addDetail('IIBF Cert', sub.iibf);
+            addDetail('Branch', `${sub.branchName} (${sub.branchZone})`);
+            addDetail('Shop Name', sub.shopName);
+            addDetail('Shop Address', `${sub.shopState || ''}, ${sub.shopDistrict || ''}, ${sub.shopTehsil || ''}, ${sub.shopVillage || ''} - ${sub.shopPin || ''}`);
+            addDetail('Shop Village Code', sub.shopVillageCode);
+            addDetail('GPS Coords', sub.shopLatitude && sub.shopLongitude ? `${sub.shopLatitude}, ${sub.shopLongitude}` : '');
+            addDetail('Permanent Address', sub.sameAsShop ? 'Same as Shop' : `${sub.permState || ''}, ${sub.permDistrict || ''}, ${sub.permTehsil || ''}, ${sub.permVillage || ''} - ${sub.permPin || ''}`);
+            addDetail('Permanent Village Code', sub.permVillageCode);
+
+            // Files
+            const fileFields = [
+                { key: 'passport', label: 'Passport Photo' },
+                { key: 'shopInside', label: 'Shop Inside' },
+                { key: 'shopOutside', label: 'Shop Outside' },
+                { key: 'aadhaarDoc', label: 'Aadhaar PDF' },
+                { key: 'panDoc', label: 'PAN PDF' },
+                { key: 'iibfDoc', label: 'IIBF PDF' },
+                { key: 'hsDoc', label: 'HS Cert PDF' },
+                { key: 'tradeDoc', label: 'Trade Licence PDF' },
+                { key: 'policeDoc', label: 'Police Verification PDF' }
+            ];
+
+            fileFields.forEach(f => {
+                const fileData = sub[f.key];
+                if (fileData && fileData.dataURL) {
+                    const item = document.createElement('div');
+                    item.className = 'detail-item';
+                    item.innerHTML = `<strong>${f.label}</strong>`;
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'file-preview';
+                    if (fileData.type && fileData.type.startsWith('image/')) {
+                        previewDiv.innerHTML = `<img src="${fileData.dataURL}" alt="${f.label}">`;
+                    } else {
+                        previewDiv.innerHTML = `<a href="${fileData.dataURL}" target="_blank" class="file-link">${fileData.name}</a>`;
+                    }
+                    item.appendChild(previewDiv);
+                    grid.appendChild(item);
+                }
+            });
+
+            card.appendChild(grid);
+            container.appendChild(card);
+        });
+    }
+
+    // ========== USER TABLE ==========
+    function renderUserTable() {
+        const users = getUsers();
+        const tbody = document.getElementById('userTableBody');
+        tbody.innerHTML = '';
+        users.forEach((user, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${user.username}</td>
+                <td>
+                    ${user.username !== currentUsername ? `<button class="btn-action btn-delete" data-index="${index}"><i class="fas fa-trash"></i> Delete</button>` : ''}
+                    <button class="btn-action btn-edit" data-index="${index}"><i class="fas fa-key"></i> Change Password</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ========== MODAL HANDLING ==========
+    const userModal = document.getElementById('userModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalUsername = document.getElementById('modalUsername');
+    const modalPassword = document.getElementById('modalPassword');
+    const modalSave = document.getElementById('modalSave');
+    const modalCancel = document.getElementById('modalCancel');
+    let editingIndex = null;
+
+    function openAddModal() {
+        editingIndex = null;
+        modalTitle.innerText = 'Add New User';
+        modalUsername.value = '';
+        modalPassword.value = '';
+        userModal.style.display = 'flex';
+    }
+
+    function openEditPasswordModal(index) {
+        editingIndex = index;
+        modalTitle.innerText = 'Change Password';
+        modalUsername.value = ''; // not used
+        modalPassword.value = '';
+        userModal.style.display = 'flex';
+    }
+
+    modalCancel.addEventListener('click', () => {
+        userModal.style.display = 'none';
+    });
+
+    modalSave.addEventListener('click', () => {
+        const users = getUsers();
+        const username = modalUsername.value.trim();
+        const password = modalPassword.value.trim();
+
+        if (!username || !password) {
+            alert('Username and password are required');
+            return;
+        }
+
+        if (editingIndex === null) {
+            // Add new user
+            if (users.some(u => u.username === username)) {
+                alert('Username already exists');
+                return;
+            }
+            users.push({ username, password });
+        } else {
+            // Change password for existing user
+            if (username && username !== users[editingIndex].username) {
+                // Optionally allow changing username? We'll keep username unchanged for password change
+                alert('Username cannot be changed here. Use delete and add new if needed.');
+                return;
+            }
+            users[editingIndex].password = password;
+        }
+
+        saveUsers(users);
+        renderUserTable();
+        userModal.style.display = 'none';
+        alert('User updated successfully');
+    });
+
+    // Delete user
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-delete') || e.target.closest('.btn-delete')) {
+            const btn = e.target.closest('.btn-delete');
+            const index = btn.getAttribute('data-index');
+            const users = getUsers();
+            if (users[index].username === currentUsername) {
+                alert('You cannot delete yourself');
+                return;
+            }
+            if (confirm('Are you sure you want to delete this user?')) {
+                users.splice(index, 1);
+                saveUsers(users);
+                renderUserTable();
+            }
+        }
+    });
+
+    // Change password (edit button)
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-edit') || e.target.closest('.btn-edit')) {
+            const btn = e.target.closest('.btn-edit');
+            const index = btn.getAttribute('data-index');
+            openEditPasswordModal(parseInt(index));
+        }
+    });
+
+    document.getElementById('addUserBtn').addEventListener('click', openAddModal);
+
+    // ========== PASSWORD CHANGE FOR CURRENT USER (optional separate modal) ==========
+    // We'll add a small button somewhere? For simplicity, we can include a "Change My Password" in user management.
+    // Let's add a button above the table.
+    // We'll create a separate modal for current user's password change.
+    const passwordModal = document.getElementById('passwordModal');
+    const oldPass = document.getElementById('oldPassword');
+    const newPass = document.getElementById('newPassword');
+    const confirmPass = document.getElementById('confirmPassword');
+    const passwordSave = document.getElementById('passwordSave');
+    const passwordCancel = document.getElementById('passwordCancel');
+
+    // Add a button to trigger password change (will be in user management)
+    const usersPane = document.getElementById('usersPane');
+    const changeMyPassBtn = document.createElement('button');
+    changeMyPassBtn.className = 'btn-add';
+    changeMyPassBtn.style.marginLeft = '10px';
+    changeMyPassBtn.innerHTML = '<i class="fas fa-key"></i> Change My Password';
+    usersPane.insertBefore(changeMyPassBtn, document.getElementById('userTable'));
+
+    changeMyPassBtn.addEventListener('click', () => {
+        passwordModal.style.display = 'flex';
+        oldPass.value = '';
+        newPass.value = '';
+        confirmPass.value = '';
+    });
+
+    passwordCancel.addEventListener('click', () => {
+        passwordModal.style.display = 'none';
+    });
+
+    passwordSave.addEventListener('click', () => {
+        const users = getUsers();
+        const currentUserIndex = users.findIndex(u => u.username === currentUsername);
+        if (currentUserIndex === -1) {
+            alert('User not found');
+            return;
+        }
+        if (users[currentUserIndex].password !== oldPass.value) {
+            alert('Old password is incorrect');
+            return;
+        }
+        if (newPass.value !== confirmPass.value) {
+            alert('New passwords do not match');
+            return;
+        }
+        if (newPass.value.trim() === '') {
+            alert('Password cannot be empty');
+            return;
+        }
+        users[currentUserIndex].password = newPass.value;
+        saveUsers(users);
+        passwordModal.style.display = 'none';
+        alert('Password changed successfully');
+    });
+
+    // ========== TABS ==========
+    const tabs = document.querySelectorAll('.tab');
+    const panes = document.querySelectorAll('.tab-pane');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            panes.forEach(pane => pane.classList.remove('active'));
+            document.getElementById(target + 'Pane').classList.add('active');
+            if (target === 'users') {
+                renderUserTable();
+            } else if (target === 'submissions') {
+                // Reload submissions in case new ones arrived
+                document.getElementById('submissionsList').innerHTML = '';
+                loadSubmissions();
+            }
+        });
+    });
+
+    // ========== LOGOUT ==========
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        sessionStorage.removeItem('bom_admin_logged_in');
+        sessionStorage.removeItem('bom_admin_user');
+        window.location.href = 'admin_login.html';
+    });
+
+    // ========== INIT ==========
+    loadSubmissions();
+    renderUserTable();
+</script>
+</body>
+</html>

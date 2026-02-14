@@ -1,0 +1,1281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Bank of Maharashtra · BC Agent Registration</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- EXIF.js for GPS metadata -->
+    <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+    <!-- Tesseract.js for OCR fallback -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <style>
+        /* ===== RESET & GLOBAL ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4f8 0%, #e6ecf3 100%);
+            min-height: 100vh;
+            padding: 16px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .form-card {
+            max-width: 1200px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px -10px rgba(0, 40, 80, 0.25);
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* ===== HEADER ===== */
+        .bank-header {
+            background: #003366;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            border-bottom: 4px solid #f9b81b;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            background: white;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            color: #003366;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            border: 2px solid #f9b81b;
+        }
+        .bank-title h1 {
+            color: white;
+            font-weight: 600;
+            font-size: 1.5rem;
+            letter-spacing: 0.3px;
+            line-height: 1.2;
+        }
+
+        /* ===== NON-CLICKABLE BANNER ===== */
+        .bank-banner {
+            background: #8B1E3F;
+            color: white;
+            text-align: center;
+            padding: 18px 20px;
+            font-weight: 500;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: default;
+            pointer-events: none;
+        }
+        .bank-banner.image-uploaded .banner-line1,
+        .bank-banner.image-uploaded .banner-line2 {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .banner-line1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            line-height: 1.4;
+            transition: opacity 0.2s;
+        }
+        .banner-line2 {
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 5px;
+            color: #FFE484;
+            transition: opacity 0.2s;
+        }
+        .banner-line2 i {
+            margin: 0 4px;
+        }
+
+        /* ===== TABS ===== */
+        .tab-bar {
+            display: flex;
+            background: #eef3f9;
+            border-bottom: 2px solid #f9b81b;
+            padding: 0 20px;
+            gap: 8px;
+        }
+        .tab {
+            padding: 14px 24px;
+            font-weight: 600;
+            color: #003366;
+            cursor: pointer;
+            border-top-left-radius: 16px;
+            border-top-right-radius: 16px;
+            background: #d9e3ef;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab.active {
+            background: white;
+            color: #003366;
+            border-bottom: 3px solid #f9b81b;
+        }
+        .tab i {
+            font-size: 1.1rem;
+        }
+        .tab:hover:not(.active) {
+            background: #cbd8e8;
+        }
+
+        /* ===== LOAD PANEL (for tab 2) ===== */
+        .load-panel {
+            background: #f9fcff;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 20px 10px 20px;
+            border: 1px solid #d4e2f0;
+            display: none;
+        }
+        .load-panel.active {
+            display: block;
+        }
+        .load-panel h3 {
+            color: #003366;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .load-fields {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .load-fields .input-field {
+            flex: 1 1 200px;
+        }
+        .load-btn {
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .load-btn:hover {
+            background: #f9b81b;
+            color: #003366;
+        }
+
+        /* ===== FORM BODY ===== */
+        .form-body {
+            padding: 1.8rem 1.5rem;
+        }
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #003366;
+            border-left: 6px solid #f9b81b;
+            padding-left: 14px;
+            margin: 25px 0 18px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title i {
+            color: #f9b81b;
+            font-size: 1.3rem;
+        }
+        .two-col-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px 20px;
+        }
+        .three-col-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px 18px;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .input-field label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #1a2e40;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .input-field label i {
+            color: #003366;
+            width: 18px;
+            font-size: 0.9rem;
+        }
+        .input-field input, 
+        .input-field select, 
+        .input-field textarea {
+            padding: 11px 14px;
+            border: 1.5px solid #dde3eb;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            background-color: #fafcff;
+            transition: 0.2s;
+            outline: none;
+            color: #0a1c2f;
+            width: 100%;
+        }
+        .input-field select:disabled,
+        .input-field input:disabled {
+            background-color: #e9eef4;
+            border-color: #c0cbd9;
+            color: #5f6f82;
+        }
+        .input-field input:focus, 
+        .input-field select:focus {
+            border-color: #003366;
+            box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1);
+            background-color: #ffffff;
+        }
+        .upload-group {
+            background: #f2f6fc;
+            border-radius: 18px;
+            padding: 12px 14px;
+            border: 1.5px dashed #b3c7de;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .upload-group label {
+            font-weight: 600;
+            color: #003366;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .upload-group input[type="file"] {
+            padding: 6px 0;
+            border: none;
+            background: transparent;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        .upload-group input[type="file"]::file-selector-button {
+            background: #003366;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            margin-right: 12px;
+            cursor: pointer;
+            border: 1px solid #003366;
+            transition: 0.2s;
+        }
+        .upload-group input[type="file"]::file-selector-button:hover {
+            background: #f9b81b;
+            color: #003366;
+            border-color: #f9b81b;
+        }
+        .upload-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            color: #28a745;
+            font-weight: 500;
+        }
+        .address-block {
+            background: #f9fcff;
+            border-radius: 24px;
+            padding: 18px 18px;
+            margin: 18px 0 8px;
+            border: 1px solid #e2ecf9;
+        }
+        .hr-divider {
+            margin: 25px 0 15px;
+            border-top: 2px dashed #cbd6e4;
+        }
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .submit-btn {
+            background: #003366;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0, 51, 102, 0.3);
+            border: 1px solid #002244;
+            justify-content: center;
+        }
+        .submit-btn i {
+            color: #f9b81b;
+        }
+        .submit-btn:hover {
+            background: #f9b81b;
+            color: #003366;
+            border-color: #f9b81b;
+        }
+        .submit-btn:hover i {
+            color: #003366;
+        }
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0 18px;
+            font-weight: 500;
+            color: #003366;
+            flex-wrap: wrap;
+        }
+        .checkbox-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #f9b81b;
+        }
+
+        /* ===== PASSPORT CLICK BOX ===== */
+        .passport-click-box {
+            width: 130px;
+            height: 150px;
+            border: 3px solid #003366;
+            border-radius: 18px;
+            background: #f0f5fe;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 8px 14px rgba(0,51,102,0.15);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .passport-click-box:hover {
+            border-color: #f9b81b;
+            transform: scale(1.02);
+            box-shadow: 0 12px 20px rgba(0,51,102,0.25);
+        }
+        .passport-click-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .preview-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #32648c;
+            font-size: 0.75rem;
+            text-align: center;
+            padding: 12px;
+        }
+        .preview-placeholder i {
+            font-size: 2.5rem;
+            color: #8aadcc;
+            margin-bottom: 6px;
+        }
+        .passport-uploaded-indicator {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            background: #28a745;
+            color: white;
+            border-radius: 30px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.9;
+            pointer-events: none;
+        }
+        #passportPhotoInput {
+            display: none;
+        }
+
+        /* ===== GPS CAMERA LINK STYLE ===== */
+        .gps-download-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #e9f0f9;
+            padding: 10px 16px;
+            border-radius: 40px;
+            color: #003366;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            border: 1px solid #b3c7de;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+        .gps-download-link:hover {
+            background: #d4e2f0;
+            border-color: #003366;
+        }
+
+        /* ===== TOP ROW ===== */
+        .top-row {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .branch-left {
+            flex: 2;
+            min-width: 280px;
+            background: #f0f7ff;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid #d4e2f0;
+        }
+        .branch-left .branch-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #003366;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .passport-right {
+            flex: 0 0 auto;
+        }
+
+        /* ===== AGENT FIRST ROW ===== */
+        .agent-first-row {
+            display: flex;
+            gap: 25px;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        .agent-first-row .fields-group {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 20px;
+            min-width: 250px;
+        }
+
+        @media (max-width: 700px) {
+            .top-row { flex-direction: column; }
+            .branch-left { width: 100%; }
+            .passport-right { width: 100%; justify-content: center; }
+            .two-col-grid, .three-col-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+            .agent-first-row .fields-group { grid-template-columns: 1fr; }
+            .button-group { flex-direction: column; }
+            .submit-btn { width: 100%; justify-content: center; }
+            .tab-bar { padding: 0 10px; }
+            .tab { padding: 10px 16px; font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="form-card">
+    <!-- HEADER -->
+    <div class="bank-header">
+        <div class="logo-area">
+            <div class="logo-icon"><i class="fas fa-university"></i></div>
+            <div class="bank-title"><h1>Bank of Maharashtra <span style="font-size: 0.8rem; display: block; color: #f9b81b;">User ID Creation Form</span></h1></div>
+        </div>
+        <div style="margin-left: auto; color: rgba(255,255,255,0.7); font-size: 0.9rem;"><i class="fas fa-id-card"></i> New Registration</div>
+    </div>
+
+    <!-- NON-CLICKABLE BANNER – always shows local image "16 copy.jpg" -->
+    <div class="bank-banner image-uploaded" id="bannerContainer" style="background-image: url('16 copy.jpg');">
+        <div class="banner-line1">बैंक ऑफ महाराष्ट्र · Bank of Maharashtra · भारत सरकार का उद्यम</div>
+        <div class="banner-line2"><i class="fas fa-qrcode"></i> Pay Nearby <i class="fas fa-bolt"></i> Zidd age badhne ki <i class="fas fa-rocket"></i></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-bar">
+        <div class="tab active" id="tabNew"><i class="fas fa-pen"></i> User ID Creation Form</div>
+        <div class="tab" id="tabEdit"><i class="fas fa-edit"></i> Preview / Edit Application</div>
+    </div>
+
+    <!-- LOAD PANEL (for tab 2) -->
+    <div class="load-panel" id="loadPanel">
+        <h3><i class="fas fa-search"></i> Load your application</h3>
+        <div class="load-fields">
+            <div class="input-field">
+                <label><i class="fas fa-credit-card"></i> PAN Number</label>
+                <input type="text" id="loadPan" placeholder="ABCDE1234F" class="uppercase-field">
+            </div>
+            <div class="input-field">
+                <label><i class="fas fa-calendar"></i> Date of Birth</label>
+                <input type="date" id="loadDob">
+            </div>
+            <button class="load-btn" id="loadBtn"><i class="fas fa-download"></i> Load Application</button>
+        </div>
+    </div>
+
+    <div class="form-body">
+        <!-- TOP ROW: BRANCH + PASSPORT -->
+        <div class="top-row">
+            <div class="branch-left">
+                <div class="branch-title"><i class="fas fa-code-branch"></i> Bank of Maharashtra Branch Selection</div>
+                <div class="two-col-grid" style="gap: 15px;">
+                    <div class="input-field"><label><i class="fas fa-building"></i> BOM Branch Name</label>
+                        <select id="branchName"><option value="">-- Select Branch --</option></select>
+                    </div>
+                    <div class="input-field"><label><i class="fas fa-map-marker-alt"></i> Branch Zone</label>
+                        <input type="text" id="branchZone" placeholder="Zone will auto-fill" readonly disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="passport-right">
+                <div class="passport-click-box" id="passportBox" tabindex="0">
+                    <input type="file" id="passportPhotoInput" accept="image/*">
+                    <img id="previewImage" src="#" alt="Passport preview" style="display: none;">
+                    <div class="preview-placeholder" id="previewPlaceholder"><i class="fas fa-camera"></i><span>Click to add photo</span></div>
+                    <div class="passport-uploaded-indicator" id="passportUploadedIndicator" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AGENT DETAILS -->
+        <div class="section-title"><i class="fas fa-user-circle"></i> Agent details</div>
+        <div class="agent-first-row">
+            <div class="fields-group">
+                <div class="input-field"><label><i class="fas fa-user-tag"></i> BC Agent Name</label><input type="text" id="agentName" placeholder="Full name" class="uppercase-field"></div>
+                <div class="input-field"><label><i class="fas fa-mobile-alt"></i> BC Agent Mobile</label><input type="tel" id="agentMobile" placeholder="9876543210" class="uppercase-field"></div>
+            </div>
+        </div>
+        <div class="two-col-grid" style="margin-bottom: 20px;">
+            <div class="input-field"><label><i class="fab fa-whatsapp"></i> WhatsApp Number</label><input type="tel" id="whatsapp" placeholder="WhatsApp number" class="uppercase-field"></div>
+            <div class="input-field"><label><i class="fas fa-envelope"></i> Email ID</label><input type="email" id="email" placeholder="agent@example.com" class="uppercase-field"></div>
+        </div>
+        <div class="two-col-grid">
+            <div class="input-field"><label><i class="fas fa-user"></i> Father's Name</label><input type="text" id="fatherName" placeholder="Father's name" class="uppercase-field"></div>
+            <div class="input-field"><label><i class="fas fa-user"></i> Mother's Name</label><input type="text" id="motherName" placeholder="Mother's name" class="uppercase-field"></div>
+            <div class="input-field"><label><i class="fas fa-calendar"></i> Date of Birth</label><input type="date" id="dob" class="uppercase-field"></div>
+            <div class="input-field"><label><i class="fas fa-id-card"></i> Aadhaar Number</label><input type="text" id="aadhaar" placeholder="1234 5678 9012" class="uppercase-field"></div>
+            <div class="input-field"><label><i class="fas fa-credit-card"></i> PAN</label><input type="text" id="pan" placeholder="ABCDE1234F" class="uppercase-field"></div>
+            <div class="input-field"><label><i class="fas fa-certificate"></i> IIBF Certificate No.</label><input type="text" id="iibf" placeholder="IIBF/12345/22" class="uppercase-field"></div>
+        </div>
+
+        <!-- SHOP ADDRESS & DETAILS (with cascading dropdowns) -->
+        <div class="address-block">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 18px;">
+                <i class="fas fa-store fa-lg" style="color: #003366;"></i>
+                <h3 style="color: #003366; font-weight: 600; font-size: 1.1rem;">Shop Address & Details</h3>
+            </div>
+            <div class="input-field full-width" style="margin-bottom: 18px;">
+                <label><i class="fas fa-store-alt"></i> Shop Name</label>
+                <input type="text" id="shopName" placeholder="e.g. Mahila Gramin Kendra" class="uppercase-field">
+            </div>
+
+            <!-- Shop location dropdowns -->
+            <div class="two-col-grid">
+                <div class="input-field"><label>State</label><select id="shopState" class="uppercase-field"><option value="">-- Select State --</option></select></div>
+                <div class="input-field"><label>District</label><select id="shopDistrict" class="uppercase-field" disabled><option value="">-- Select District --</option></select></div>
+                <div class="input-field"><label>Tehsil/Block/Taluka</label><select id="shopTehsil" class="uppercase-field" disabled><option value="">-- Select Tehsil --</option></select></div>
+                <div class="input-field"><label>Village Name</label><select id="shopVillage" class="uppercase-field" disabled><option value="">-- Select Village --</option></select></div>
+                <div class="input-field"><label>Village Code</label><input type="text" id="shopVillageCode" placeholder="Auto-filled" class="uppercase-field" readonly></div>
+                <div class="input-field"><label>PIN Code</label><input type="text" id="shopPin" placeholder="PIN" class="uppercase-field"></div>
+            </div>
+
+            <!-- GPS Photo uploads + Download link -->
+            <div style="margin-top: 20px;">
+                <div class="three-col-grid">
+                    <div class="upload-group">
+                        <label><i class="fas fa-camera"></i> Shop Inside Photo (GPS Camera)</label>
+                        <input type="file" id="shopInside" accept="image/*" class="upload-file">
+                        <div class="upload-status" id="shopInsideStatus" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div>
+                    </div>
+                    <div class="upload-group">
+                        <label><i class="fas fa-camera"></i> Shop Outside Photo (GPS Camera)</label>
+                        <input type="file" id="shopOutside" accept="image/*" class="upload-file">
+                        <div class="upload-status" id="shopOutsideStatus" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div>
+                    </div>
+                </div>
+                <!-- GPS Camera Download Link -->
+                <a href="https://play.google.com/store/apps/details?id=com.tusharrk.gpsmapcamera.geotagginglocationphoto.weather" target="_blank" class="gps-download-link">
+                    <i class="fas fa-download"></i> Download GPS Camera app (for geotagged photos)
+                </a>
+            </div>
+
+            <!-- Latitude & Longitude -->
+            <div style="margin-top: 20px;">
+                <div class="two-col-grid">
+                    <div class="input-field"><label><i class="fas fa-map-pin"></i> Shop Latitude</label><input type="text" step="any" id="shopLatitude" placeholder="Auto-filled from inside photo" class="uppercase-field" readonly></div>
+                    <div class="input-field"><label><i class="fas fa-map-pin"></i> Shop Longitude</label><input type="text" step="any" id="shopLongitude" placeholder="Auto-filled from inside photo" class="uppercase-field" readonly></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PERMANENT ADDRESS (now dropdowns, linked via JSON) -->
+        <div class="address-block" style="margin-top: 5px;">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 8px;">
+                <i class="fas fa-map-marked-alt fa-lg" style="color: #003366;"></i>
+                <h3 style="color: #003366; font-weight: 600; font-size: 1.1rem;">Permanent Address</h3>
+            </div>
+            <div class="checkbox-row">
+                <input type="checkbox" id="sameAsShopCheckbox">
+                <label for="sameAsShopCheckbox"><strong>Same as Shop Address</strong> (copies below)</label>
+            </div>
+            <div class="two-col-grid" id="permanentFields">
+                <!-- State dropdown -->
+                <div class="input-field"><label>State</label><select id="permStateSelect" class="uppercase-field"><option value="">-- Select State --</option></select></div>
+                <!-- District dropdown -->
+                <div class="input-field"><label>District</label><select id="permDistrictSelect" class="uppercase-field" disabled><option value="">-- Select District --</option></select></div>
+                <!-- Tehsil dropdown -->
+                <div class="input-field"><label>Tehsil/Block/Taluka</label><select id="permTehsilSelect" class="uppercase-field" disabled><option value="">-- Select Tehsil --</option></select></div>
+                <!-- Village dropdown -->
+                <div class="input-field"><label>Village Name</label><select id="permVillageSelect" class="uppercase-field" disabled><option value="">-- Select Village --</option></select></div>
+                <!-- Village Code (readonly) -->
+                <div class="input-field"><label>Village Code</label><input type="text" id="permVillageCode" placeholder="Auto-filled" class="uppercase-field" readonly></div>
+                <!-- PIN Code -->
+                <div class="input-field"><label>PIN Code</label><input type="text" id="permPin" placeholder="PIN" class="uppercase-field"></div>
+            </div>
+        </div>
+
+        <!-- DOCUMENTS UPLOAD (PDF only) -->
+        <div class="section-title" style="margin-top: 30px;"><i class="fas fa-cloud-upload-alt"></i> Required documents (PDF only)</div>
+        <div class="three-col-grid">
+            <div class="upload-group"><label><i class="fas fa-id-card"></i> Aadhaar Card</label><input type="file" id="aadhaarDoc" accept=".pdf" class="upload-file pdf-upload"><div class="upload-status" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div></div>
+            <div class="upload-group"><label><i class="fas fa-id-card"></i> PAN Card</label><input type="file" id="panDoc" accept=".pdf" class="upload-file pdf-upload"><div class="upload-status" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div></div>
+            <div class="upload-group"><label><i class="fas fa-certificate"></i> IIBF Certificate</label><input type="file" id="iibfDoc" accept=".pdf" class="upload-file pdf-upload"><div class="upload-status" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div></div>
+            <div class="upload-group"><label><i class="fas fa-graduation-cap"></i> HS Certificate</label><input type="file" id="hsDoc" accept=".pdf" class="upload-file pdf-upload"><div class="upload-status" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div></div>
+            <div class="upload-group"><label><i class="fas fa-file-signature"></i> Trade Licences</label><input type="file" id="tradeDoc" accept=".pdf" multiple class="upload-file pdf-upload"><div class="upload-status" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div></div>
+            <div class="upload-group"><label><i class="fas fa-shield-alt"></i> Police Verification</label><input type="file" id="policeDoc" accept=".pdf" class="upload-file pdf-upload"><div class="upload-status" style="display: none;"><i class="fas fa-check-circle"></i> Uploaded</div></div>
+        </div>
+
+        <div class="hr-divider"></div>
+        <div style="display: flex; justify-content: space-between; color: #345f8c; font-size: 0.85rem;">
+            <span><i class="far fa-check-circle" style="color: #f9b81b;"></i> All fields mandatory unless marked</span>
+            <span><i class="fas fa-shield-alt"></i> Encrypted & secure</span>
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <div class="button-group">
+            <button class="submit-btn" id="submitBtn"><i class="fas fa-check-circle"></i> Submit application <i class="fas fa-arrow-right"></i></button>
+        </div>
+        <div style="text-align: center; margin-top: 15px; color: #a4bbd5; font-size: 0.8rem;"><i class="fas fa-print"></i> Bank of Maharashtra – User ID Creation</div>
+    </div>
+</div>
+
+<script>
+(function() {
+    // Branch data
+    const branchData = [
+        { name: "Main Branch", zone: "ZONE A" },
+        { name: "North Branch", zone: "ZONE B" },
+        { name: "South Branch", zone: "ZONE C" },
+        { name: "East Branch", zone: "ZONE B" },
+        { name: "West Branch", zone: "ZONE A" },
+        { name: "Central Branch", zone: "ZONE D" }
+    ];
+
+    // Helper: DMS to DD
+    function convertDMSToDD(dmsArray, ref) {
+        let dd = dmsArray[0] + dmsArray[1]/60 + dmsArray[2]/3600;
+        if (ref === "S" || ref === "W") dd = -dd;
+        return dd;
+    }
+
+    function extractLatLonFromText(text) {
+        const pattern = /([+-]?\d+\.\d+)[°\s]*/g;
+        const matches = [...text.matchAll(pattern)];
+        if (matches.length >= 2) {
+            const lat = parseFloat(matches[0][1]);
+            const lon = parseFloat(matches[1][1]);
+            if (!isNaN(lat) && !isNaN(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180) return { lat, lon };
+        }
+        return null;
+    }
+
+    async function performOCR(file) {
+        try {
+            const { data: { text } } = await Tesseract.recognize(file, 'eng', { logger: m => console.log(m) });
+            return extractLatLonFromText(text);
+        } catch { return null; }
+    }
+
+    function setupGpsExtraction(fileInputId, latFieldId, lonFieldId) {
+        const input = document.getElementById(fileInputId);
+        if (!input) return;
+        let currentFileId = 0;
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            document.getElementById(latFieldId).value = '';
+            document.getElementById(lonFieldId).value = '';
+            const thisFileId = ++currentFileId;
+            if (typeof EXIF !== 'undefined') {
+                EXIF.getData(file, function() {
+                    if (thisFileId !== currentFileId) return;
+                    try {
+                        const lat = EXIF.getTag(this, "GPSLatitude");
+                        const lon = EXIF.getTag(this, "GPSLongitude");
+                        const latRef = EXIF.getTag(this, "GPSLatitudeRef");
+                        const lonRef = EXIF.getTag(this, "GPSLongitudeRef");
+                        if (lat && lon && latRef && lonRef) {
+                            document.getElementById(latFieldId).value = convertDMSToDD(lat, latRef).toFixed(6);
+                            document.getElementById(lonFieldId).value = convertDMSToDD(lon, lonRef).toFixed(6);
+                            return;
+                        }
+                    } catch (err) { console.warn(err); }
+                    if (thisFileId !== currentFileId) return;
+                    performOCR(file).then(coords => {
+                        if (thisFileId !== currentFileId) return;
+                        if (coords) {
+                            document.getElementById(latFieldId).value = coords.lat.toFixed(6);
+                            document.getElementById(lonFieldId).value = coords.lon.toFixed(6);
+                        }
+                    });
+                });
+            } else {
+                performOCR(file).then(coords => {
+                    if (thisFileId !== currentFileId) return;
+                    if (coords) { document.getElementById(latFieldId).value = coords.lat.toFixed(6); document.getElementById(lonFieldId).value = coords.lon.toFixed(6); }
+                });
+            }
+        });
+    }
+
+    function setupPdfValidation() {
+        document.querySelectorAll('.pdf-upload').forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file && file.type !== 'application/pdf') {
+                    alert('Only PDF files are allowed.');
+                    this.value = '';
+                    const statusDiv = this.parentElement.querySelector('.upload-status');
+                    if (statusDiv) statusDiv.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Build hierarchy from raw data
+    function buildLocationHierarchy(rawData) {
+        const stateMap = new Map();
+        rawData.forEach(item => {
+            const state = item.State || "Unknown State";
+            const district = item.District || "Unknown District";
+            let tehsil = item["Tehsil/Block/Taluka"] || "Unspecified";
+            if (!tehsil.trim()) tehsil = "Unspecified";
+            let villageName = (item["Village Name"] || "").replace(/^"+|"+$/g, '').trim();
+            let villageCode = item["Village Code"] || "";
+
+            if (!stateMap.has(state)) stateMap.set(state, new Map());
+            const districtMap = stateMap.get(state);
+            if (!districtMap.has(district)) districtMap.set(district, new Map());
+            const tehsilMap = districtMap.get(district);
+            if (!tehsilMap.has(tehsil)) tehsilMap.set(tehsil, []);
+            tehsilMap.get(tehsil).push({ name: villageName, code: villageCode });
+        });
+
+        const states = [];
+        for (let [stateName, districtMap] of stateMap.entries()) {
+            const districts = [];
+            for (let [districtName, tehsilMap] of districtMap.entries()) {
+                const tehsils = [];
+                for (let [tehsilName, villages] of tehsilMap.entries()) {
+                    tehsils.push({ name: tehsilName, villages: villages });
+                }
+                districts.push({ name: districtName, tehsils: tehsils });
+            }
+            states.push({ name: stateName, districts: districts });
+        }
+        return { states };
+    }
+
+    // Generic cascading dropdown initializer
+    function initCascadingLocation(prefix, locationData) {
+        const stateSel = document.getElementById(prefix + 'State');
+        const districtSel = document.getElementById(prefix + 'District');
+        const tehsilSel = document.getElementById(prefix + 'Tehsil');
+        const villageSel = document.getElementById(prefix + 'Village');
+        const villageCode = document.getElementById(prefix + 'VillageCode');
+        if (!stateSel) return;
+
+        locationData.states.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.name; opt.textContent = s.name;
+            stateSel.appendChild(opt);
+        });
+
+        function populateDistrict(selectedState) {
+            districtSel.innerHTML = '<option value="">-- Select District --</option>';
+            tehsilSel.innerHTML = '<option value="">-- Select Tehsil --</option>';
+            villageSel.innerHTML = '<option value="">-- Select Village --</option>';
+            villageCode.value = '';
+            districtSel.disabled = !selectedState;
+            tehsilSel.disabled = true;
+            villageSel.disabled = true;
+            if (!selectedState) return;
+            const state = locationData.states.find(s => s.name === selectedState);
+            if (state) {
+                state.districts.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.name; opt.textContent = d.name;
+                    districtSel.appendChild(opt);
+                });
+            }
+        }
+
+        function populateTehsil(selectedDistrict) {
+            tehsilSel.innerHTML = '<option value="">-- Select Tehsil --</option>';
+            villageSel.innerHTML = '<option value="">-- Select Village --</option>';
+            villageCode.value = '';
+            tehsilSel.disabled = !selectedDistrict;
+            villageSel.disabled = true;
+            if (!selectedDistrict) return;
+            const state = locationData.states.find(s => s.name === stateSel.value);
+            if (!state) return;
+            const district = state.districts.find(d => d.name === selectedDistrict);
+            if (district) {
+                district.tehsils.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t.name; opt.textContent = t.name === "Unspecified" ? "— No Tehsil —" : t.name;
+                    tehsilSel.appendChild(opt);
+                });
+            }
+        }
+
+        function populateVillage(selectedTehsil) {
+            villageSel.innerHTML = '<option value="">-- Select Village --</option>';
+            villageCode.value = '';
+            villageSel.disabled = !selectedTehsil;
+            if (!selectedTehsil) return;
+            const state = locationData.states.find(s => s.name === stateSel.value);
+            if (!state) return;
+            const district = state.districts.find(d => d.name === districtSel.value);
+            if (!district) return;
+            const tehsil = district.tehsils.find(t => t.name === selectedTehsil);
+            if (tehsil) {
+                tehsil.villages.forEach(v => {
+                    const opt = document.createElement('option');
+                    opt.value = v.name; opt.textContent = v.name;
+                    opt.dataset.code = v.code;
+                    villageSel.appendChild(opt);
+                });
+            }
+        }
+
+        stateSel.addEventListener('change', function() { populateDistrict(this.value); });
+        districtSel.addEventListener('change', function() { populateTehsil(this.value); });
+        tehsilSel.addEventListener('change', function() { populateVillage(this.value); });
+        villageSel.addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            villageCode.value = selected ? selected.dataset.code || '' : '';
+        });
+    }
+
+    // ===== LOCALSTORAGE FUNCTIONS =====
+    const STORAGE_KEY = 'bom_submissions';
+
+    // Save submission to localStorage array
+    async function saveSubmission(formData) {
+        const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        submissions.push(formData);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(submissions));
+    }
+
+    // Find submission by PAN and DOB
+    function findSubmission(pan, dob) {
+        const submissions = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        // Return the latest matching (could be multiple, we take last)
+        return submissions.reverse().find(s => s.pan === pan && s.dob === dob);
+    }
+
+    // Convert file to data URL
+    function fileToDataURL(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Convert data URL to File
+    function dataURLToFile(dataurl, filename) {
+        let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1];
+        let bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while(n--) u8arr[n] = bstr.charCodeAt(n);
+        return new File([u8arr], filename, { type: mime });
+    }
+
+    // Collect all form data (including files) and return a promise with the data object
+    async function collectFormData() {
+        const data = {};
+
+        // Simple fields
+        data.branchName = document.getElementById('branchName').value;
+        data.branchZone = document.getElementById('branchZone').value;
+        data.agentName = document.getElementById('agentName').value;
+        data.agentMobile = document.getElementById('agentMobile').value;
+        data.whatsapp = document.getElementById('whatsapp').value;
+        data.email = document.getElementById('email').value;
+        data.fatherName = document.getElementById('fatherName').value;
+        data.motherName = document.getElementById('motherName').value;
+        data.dob = document.getElementById('dob').value;
+        data.aadhaar = document.getElementById('aadhaar').value;
+        data.pan = document.getElementById('pan').value;
+        data.iibf = document.getElementById('iibf').value;
+        data.shopName = document.getElementById('shopName').value;
+        data.shopState = document.getElementById('shopState').value;
+        data.shopDistrict = document.getElementById('shopDistrict').value;
+        data.shopTehsil = document.getElementById('shopTehsil').value;
+        data.shopVillage = document.getElementById('shopVillage').value;
+        data.shopVillageCode = document.getElementById('shopVillageCode').value;
+        data.shopPin = document.getElementById('shopPin').value;
+        data.shopLatitude = document.getElementById('shopLatitude').value;
+        data.shopLongitude = document.getElementById('shopLongitude').value;
+        data.permState = document.getElementById('permStateSelect').value;
+        data.permDistrict = document.getElementById('permDistrictSelect').value;
+        data.permTehsil = document.getElementById('permTehsilSelect').value;
+        data.permVillage = document.getElementById('permVillageSelect').value;
+        data.permVillageCode = document.getElementById('permVillageCode').value;
+        data.permPin = document.getElementById('permPin').value;
+        data.sameAsShop = document.getElementById('sameAsShopCheckbox').checked;
+
+        // Files: passport, shopInside, shopOutside, docs
+        const fileInputs = [
+            { id: 'passportPhotoInput', key: 'passport' },
+            { id: 'shopInside', key: 'shopInside' },
+            { id: 'shopOutside', key: 'shopOutside' },
+            { id: 'aadhaarDoc', key: 'aadhaarDoc' },
+            { id: 'panDoc', key: 'panDoc' },
+            { id: 'iibfDoc', key: 'iibfDoc' },
+            { id: 'hsDoc', key: 'hsDoc' },
+            { id: 'tradeDoc', key: 'tradeDoc' },
+            { id: 'policeDoc', key: 'policeDoc' }
+        ];
+
+        for (let fi of fileInputs) {
+            const input = document.getElementById(fi.id);
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                data[fi.key] = {
+                    name: file.name,
+                    type: file.type,
+                    dataURL: await fileToDataURL(file)
+                };
+            } else {
+                data[fi.key] = null;
+            }
+        }
+
+        // Add timestamp
+        data.timestamp = new Date().toISOString();
+        return data;
+    }
+
+    // Populate form from saved data object
+    function populateForm(data) {
+        // Simple fields
+        document.getElementById('branchName').value = data.branchName || '';
+        document.getElementById('branchZone').value = data.branchZone || '';
+        document.getElementById('agentName').value = data.agentName || '';
+        document.getElementById('agentMobile').value = data.agentMobile || '';
+        document.getElementById('whatsapp').value = data.whatsapp || '';
+        document.getElementById('email').value = data.email || '';
+        document.getElementById('fatherName').value = data.fatherName || '';
+        document.getElementById('motherName').value = data.motherName || '';
+        document.getElementById('dob').value = data.dob || '';
+        document.getElementById('aadhaar').value = data.aadhaar || '';
+        document.getElementById('pan').value = data.pan || '';
+        document.getElementById('iibf').value = data.iibf || '';
+        document.getElementById('shopName').value = data.shopName || '';
+        document.getElementById('shopState').value = data.shopState || '';
+        document.getElementById('shopState').dispatchEvent(new Event('change'));
+        document.getElementById('shopDistrict').value = data.shopDistrict || '';
+        document.getElementById('shopDistrict').dispatchEvent(new Event('change'));
+        document.getElementById('shopTehsil').value = data.shopTehsil || '';
+        document.getElementById('shopTehsil').dispatchEvent(new Event('change'));
+        document.getElementById('shopVillage').value = data.shopVillage || '';
+        document.getElementById('shopVillage').dispatchEvent(new Event('change'));
+        document.getElementById('shopVillageCode').value = data.shopVillageCode || '';
+        document.getElementById('shopPin').value = data.shopPin || '';
+        document.getElementById('shopLatitude').value = data.shopLatitude || '';
+        document.getElementById('shopLongitude').value = data.shopLongitude || '';
+        document.getElementById('permStateSelect').value = data.permState || '';
+        document.getElementById('permStateSelect').dispatchEvent(new Event('change'));
+        document.getElementById('permDistrictSelect').value = data.permDistrict || '';
+        document.getElementById('permDistrictSelect').dispatchEvent(new Event('change'));
+        document.getElementById('permTehsilSelect').value = data.permTehsil || '';
+        document.getElementById('permTehsilSelect').dispatchEvent(new Event('change'));
+        document.getElementById('permVillageSelect').value = data.permVillage || '';
+        document.getElementById('permVillageSelect').dispatchEvent(new Event('change'));
+        document.getElementById('permVillageCode').value = data.permVillageCode || '';
+        document.getElementById('permPin').value = data.permPin || '';
+        document.getElementById('sameAsShopCheckbox').checked = data.sameAsShop || false;
+        if (data.sameAsShop) {
+            document.getElementById('sameAsShopCheckbox').dispatchEvent(new Event('change'));
+        }
+
+        // Files: need to set file inputs
+        const fileMappings = [
+            { key: 'passport', id: 'passportPhotoInput' },
+            { key: 'shopInside', id: 'shopInside' },
+            { key: 'shopOutside', id: 'shopOutside' },
+            { key: 'aadhaarDoc', id: 'aadhaarDoc' },
+            { key: 'panDoc', id: 'panDoc' },
+            { key: 'iibfDoc', id: 'iibfDoc' },
+            { key: 'hsDoc', id: 'hsDoc' },
+            { key: 'tradeDoc', id: 'tradeDoc' },
+            { key: 'policeDoc', id: 'policeDoc' }
+        ];
+
+        fileMappings.forEach(m => {
+            const fileData = data[m.key];
+            const input = document.getElementById(m.id);
+            if (fileData && fileData.dataURL) {
+                const file = dataURLToFile(fileData.dataURL, fileData.name);
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                input.files = dataTransfer.files;
+                // Update status
+                const statusDiv = input.parentElement.querySelector('.upload-status');
+                if (statusDiv) statusDiv.style.display = 'flex';
+                // Special handling for passport preview
+                if (m.id === 'passportPhotoInput') {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        document.getElementById('previewImage').src = ev.target.result;
+                        document.getElementById('previewImage').style.display = 'block';
+                        document.getElementById('previewPlaceholder').style.display = 'none';
+                        document.getElementById('passportUploadedIndicator').style.display = 'flex';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            } else {
+                input.value = '';
+                const statusDiv = input.parentElement.querySelector('.upload-status');
+                if (statusDiv) statusDiv.style.display = 'none';
+                if (m.id === 'passportPhotoInput') {
+                    document.getElementById('previewImage').src = '#';
+                    document.getElementById('previewImage').style.display = 'none';
+                    document.getElementById('previewPlaceholder').style.display = 'flex';
+                    document.getElementById('passportUploadedIndicator').style.display = 'none';
+                }
+            }
+        });
+
+        // Trigger branch zone update
+        document.getElementById('branchName').dispatchEvent(new Event('change'));
+    }
+
+    // Tab switching
+    const tabNew = document.getElementById('tabNew');
+    const tabEdit = document.getElementById('tabEdit');
+    const loadPanel = document.getElementById('loadPanel');
+
+    tabNew.addEventListener('click', () => {
+        tabNew.classList.add('active');
+        tabEdit.classList.remove('active');
+        loadPanel.classList.remove('active');
+    });
+
+    tabEdit.addEventListener('click', () => {
+        tabEdit.classList.add('active');
+        tabNew.classList.remove('active');
+        loadPanel.classList.add('active');
+    });
+
+    // Load button
+    document.getElementById('loadBtn').addEventListener('click', function() {
+        const pan = document.getElementById('loadPan').value.trim().toUpperCase();
+        const dob = document.getElementById('loadDob').value;
+        const submission = findSubmission(pan, dob);
+        if (submission) {
+            populateForm(submission);
+            tabNew.click(); // switch to form tab
+            alert('Application loaded successfully. You can now edit and submit again.');
+        } else {
+            alert('No application found with that PAN and Date of Birth.');
+        }
+    });
+
+    // Submit button
+    document.getElementById('submitBtn').addEventListener('click', async function() {
+        const formData = await collectFormData();
+        await saveSubmission(formData);
+        alert('Form submitted successfully! You can now use the Preview / Edit tab to load it with PAN and DOB.');
+    });
+
+    // ========== INIT ==========
+    window.addEventListener('DOMContentLoaded', function() {
+        // Branch dropdown
+        const branchSelect = document.getElementById('branchName');
+        const branchZone = document.getElementById('branchZone');
+        branchData.forEach(b => {
+            const opt = document.createElement('option');
+            opt.value = b.name; opt.textContent = b.name;
+            branchSelect.appendChild(opt);
+        });
+        branchSelect.addEventListener('change', function() {
+            const found = branchData.find(b => b.name === this.value);
+            branchZone.value = found ? found.zone : '';
+        });
+
+        // Uppercase fields
+        document.querySelectorAll('.uppercase-field').forEach(f => {
+            f.addEventListener('input', function(e) {
+                if (['text','tel','email','textarea'].includes(this.type)) {
+                    const start = this.selectionStart, end = this.selectionEnd;
+                    this.value = this.value.toUpperCase();
+                    this.setSelectionRange(start, end);
+                }
+            });
+        });
+
+        // File upload status
+        document.querySelectorAll('.upload-file').forEach(input => {
+            input.addEventListener('change', function() {
+                const statusDiv = this.parentElement.querySelector('.upload-status');
+                if (statusDiv) statusDiv.style.display = this.files.length > 0 ? 'flex' : 'none';
+            });
+        });
+
+        setupPdfValidation();
+
+        // Passport box
+        const passportBox = document.getElementById('passportBox');
+        const passportInput = document.getElementById('passportPhotoInput');
+        const previewImage = document.getElementById('previewImage');
+        const previewPlaceholder = document.getElementById('previewPlaceholder');
+        const uploadedIndicator = document.getElementById('passportUploadedIndicator');
+        passportBox.addEventListener('click', () => passportInput.click());
+        passportInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    previewImage.src = ev.target.result;
+                    previewImage.style.display = 'block';
+                    previewPlaceholder.style.display = 'none';
+                    uploadedIndicator.style.display = 'flex';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.src = '#';
+                previewImage.style.display = 'none';
+                previewPlaceholder.style.display = 'flex';
+                uploadedIndicator.style.display = 'none';
+            }
+        });
+
+        // GPS extraction only from inside photo
+        setupGpsExtraction('shopInside', 'shopLatitude', 'shopLongitude');
+
+        // Fetch location data and init dropdowns (shop + permanent)
+        fetch('locationData.json')
+            .then(res => {
+                if (!res.ok) throw new Error('locationData.json not found');
+                return res.json();
+            })
+            .then(rawData => {
+                const locationData = buildLocationHierarchy(rawData);
+
+                // Initialize shop dropdowns (prefix 'shop')
+                initCascadingLocation('shop', locationData);
+                // Initialize permanent dropdowns (prefix 'perm')
+                initCascadingLocation('perm', locationData);
+
+                // Now handle "Same as Shop" checkbox
+                const sameCheck = document.getElementById('sameAsShopCheckbox');
+                const shopState = document.getElementById('shopState');
+                const shopDistrict = document.getElementById('shopDistrict');
+                const shopTehsil = document.getElementById('shopTehsil');
+                const shopVillage = document.getElementById('shopVillage');
+                const shopVillageCode = document.getElementById('shopVillageCode');
+                const shopPin = document.getElementById('shopPin');
+
+                const permState = document.getElementById('permStateSelect');
+                const permDistrict = document.getElementById('permDistrictSelect');
+                const permTehsil = document.getElementById('permTehsilSelect');
+                const permVillage = document.getElementById('permVillageSelect');
+                const permVillageCode = document.getElementById('permVillageCode');
+                const permPin = document.getElementById('permPin');
+
+                function copyShopToPermanent() {
+                    if (!sameCheck.checked) return;
+                    permState.value = shopState.value;
+                    permState.dispatchEvent(new Event('change'));
+                    permDistrict.value = shopDistrict.value;
+                    permDistrict.dispatchEvent(new Event('change'));
+                    permTehsil.value = shopTehsil.value;
+                    permTehsil.dispatchEvent(new Event('change'));
+                    permVillage.value = shopVillage.value;
+                    permVillage.dispatchEvent(new Event('change'));
+                    permVillageCode.value = shopVillageCode.value;
+                    permPin.value = shopPin.value.toUpperCase();
+                }
+
+                sameCheck.addEventListener('change', function(e) {
+                    const checked = this.checked;
+                    [permState, permDistrict, permTehsil, permVillage, permPin].forEach(f => {
+                        if (f) f.disabled = checked;
+                    });
+                    if (checked) copyShopToPermanent();
+                });
+
+                [shopState, shopDistrict, shopTehsil, shopVillage, shopVillageCode, shopPin].forEach(field => {
+                    field.addEventListener('change', function() {
+                        if (sameCheck.checked) copyShopToPermanent();
+                    });
+                });
+                shopPin.addEventListener('input', function() {
+                    if (sameCheck.checked && permPin) permPin.value = this.value.toUpperCase();
+                });
+            })
+            .catch(err => {
+                console.error('Location data error:', err);
+                alert('Could not load locationData.json. Ensure it exists in the same folder.');
+            });
+    });
+})();
+</script>
+</body>
+</html>
